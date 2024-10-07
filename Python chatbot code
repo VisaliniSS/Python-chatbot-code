@@ -1,0 +1,59 @@
+from flask import Flask, render_template, request
+import nltk
+from nltk.chat.util import Chat, reflections
+
+# Initialize Flask app
+app = Flask(__name__)
+
+# Define pairs of questions and answers
+pairs = [
+    [
+        r"my name is (.*)",
+        ["Hello %1, How can I help you today?",]
+    ],
+    [
+        r"what is your name?",
+        ["I am a chatbot created to assist students.",]
+    ],
+    [
+        r"how are you?",
+        ["I'm doing great! How about you?",]
+    ],
+    [
+        r"what can you do?",
+        ["I can answer your queries related to your studies. Ask me anything!",]
+    ],
+    [
+        r"(.*) (location|city)?",
+        ["I'm virtual, but you can access me from anywhere!",]
+    ],
+    [
+        r"(.*) study tips?",
+        ["Here are a few tips: 1) Stay organized, 2) Take breaks, 3) Practice consistently.",]
+    ],
+    [
+        r"quit",
+        ["Goodbye! Take care and study well!",]
+    ],
+    [
+        r"(.*)",
+        ["I'm sorry, I don't have an answer to that right now. Try asking something else.",]
+    ],
+]
+
+# Create chatbot using NLTK's Chat class
+chatbot = Chat(pairs, reflections)
+
+# Route for the chatbot webpage
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+# Route for chatbot responses
+@app.route("/get")
+def get_bot_response():
+    user_text = request.args.get("msg")
+    return str(chatbot.respond(user_text))
+
+if __name__ == "__main__":
+    app.run(debug=True)
